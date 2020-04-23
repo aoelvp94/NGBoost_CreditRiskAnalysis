@@ -5,6 +5,7 @@ REPO OF USEFUL FUNCTIONS
 # ngboost and modelling libraries
 from sklearn.metrics import roc_auc_score, roc_curve, classification_report
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import LocalOutlierFactor
 
 # data manipulation libraries
 import pandas as pd
@@ -57,10 +58,10 @@ def preprocess_df(df):
     Preprocess df imputing certain columns such as MonthlyIncome and NumberOfDependencies
     
     Args:
-        -df (DataFrame object): df to be computed
+        - df (DataFrame object): df to be computed
     """
-    df["MonthlyIncome"].fillna(0, inplace=True)
-    df["NumberOfDependents"].fillna(0, inplace=True)
+
+    """
     for col in [
         "RevolvingUtilizationOfUnsecuredLines",
         "NumberOfTime30-59DaysPastDueNotWorse",
@@ -72,7 +73,23 @@ def preprocess_df(df):
         "NumberOfTime60-89DaysPastDueNotWorse",
         "NumberOfDependents",
     ]:
-        df.loc[(df["age"] < 18) | (df["age"] >= 60), col] = 0
+        df.loc[(df["age"] < 18) | (df["age"] >= 60), col] = 18
+    """
+
+    df["MonthlyIncome"].fillna(np.mean(df["MonthlyIncome"]), inplace=True)
+    df["NumberOfDependents"].fillna(0, inplace=True)
+    df.loc[(df["age"] < 18), "age"] = 18
+    df.loc[(df["age"] >= 60), "age"] = 60
+    df.loc[(df["age"] >= 60), "age"] = 60
+
+
+def clean_outliers(df):
+
+    local_outlier_factor = LocalOutlierFactor(contamination=0.05)
+    preprocess_df(df)
+    is_outlier = local_outlier_factor.fit_predict(df[cols[1:]]) == -1
+    data_outlier_excluded = df.loc[~is_outlier, :]
+    return data_outlier_excluded
 
 
 def scaling_values_df(df):
@@ -283,7 +300,7 @@ def visualize_roc_curve(model, X_test, y_test):
     data = [trace0, trace1]
 
     # Edit the layout
-    layout = dict(title="ROC curve", xaxis=dict(title="FPR"), yaxis=dict(title="TPR"),)
+    layout = dict(title="ROC curve", xaxis=dict(title="FPR"), yaxis=dict(title="TPR"))
 
     fig = dict(data=data, layout=layout)
 
