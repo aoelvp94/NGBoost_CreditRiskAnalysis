@@ -79,8 +79,7 @@ def preprocess_df(df):
     df["MonthlyIncome"].fillna(np.mean(df["MonthlyIncome"]), inplace=True)
     df["NumberOfDependents"].fillna(0, inplace=True)
     df.loc[(df["age"] < 18), "age"] = 18
-    df.loc[(df["age"] >= 60), "age"] = 60
-    df.loc[(df["age"] >= 60), "age"] = 60
+    df.loc[(df["age"] > 60), "age"] = 60
 
 
 def clean_outliers(df):
@@ -162,6 +161,49 @@ def plot_trace_line(df_target_zero, df_target_one, column_to_op, op_name):
         y=df_target_one_op[column_to_op],
         name="TARGET=1",
         line=dict(color="rgb(32, 205, 119)", width=4),
+    )
+    data = [trace0, trace1]
+
+    # Edit the layout
+    layout = dict(
+        title=f"{op_name} of {column_to_op} according to the age",
+        xaxis=dict(title="Age"),
+        yaxis=dict(title=f"{op_name} of {column_to_op}"),
+    )
+
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
+
+
+def plot_trace_line2(df_target_zero, df_target_one, column_to_op, op_name):
+    """
+    Plot lines with 'age' column as x axis and custom column (to compute sum/avg).
+    
+    Args:
+        - df_target_zero (DataFrame Object): rows of df that contain target = 0
+        - df_target_ one (DataFrame Object): rows of df that contain target = 1
+        - column_to_op (string): name of column to be computed
+        - op_name (string): Operation to be computed. For example: "Sum" or "Avg" 
+    """
+    if op_name == "Sum":
+        df_target_zero_op = df_target_zero.groupby("age").sum()
+        df_target_one_op = df_target_one.groupby("age").sum()
+    if op_name == "Avg":
+        df_target_zero_op = df_target_zero.groupby("age").mean()
+        df_target_one_op = df_target_one.groupby("age").mean()
+
+    # Create and style traces
+    trace0 = go.Scatter(
+        x=df_target_zero_op.index,
+        y=df_target_zero_op[column_to_op],
+        name="TARGET=0",
+        line=dict(color="rgb(86,157, 242)", width=4),
+    )
+    trace1 = go.Scatter(
+        x=df_target_one_op.index,
+        y=df_target_one_op[column_to_op],
+        name="TARGET=1",
+        line=dict(color="rgb(239, 102, 75)", width=4),
     )
     data = [trace0, trace1]
 
