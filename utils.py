@@ -17,7 +17,7 @@ from sklearn.inspection import permutation_importance
 
 def register_imputation(df):
     """
-    Register imputations of df
+    Register imputations of certain df
     Args:
         - df (DataFrame): Dataframe to be computed
     Return df with filled values and booleans that indicate if each row was changed
@@ -25,7 +25,7 @@ def register_imputation(df):
     for c in cols[1:]:
         # df[f"{c}_amputado"] = df[f"{c}"].fillna(0)
         df[f"{c}_imputed"] = df[f"{c}"].fillna(0)
-        df[f"dummy_falta_{c}"] = (df[f"{c}"] != df[f"{c}_imputed"]).astype(int)
+        df[f"dummy_{c}"] = (df[f"{c}"] != df[f"{c}_imputed"]).astype(int)
         del df[f"{c}"]
         df.columns = df.columns.str.replace(f"{c}_imputed", f"{c}")
     return df
@@ -217,3 +217,6 @@ def generate_y_pred_with_custom_threshold(model, x_data, threshold):
     print("count_zero " + str(count_zero))
     print("count_one " + str(count_one))
     return y_pred
+
+
+    

@@ -6,7 +6,7 @@ import numpy as np
 import plotly as py
 import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-from constants import cols
+from constants import cols, cols_with_missing_indicators
 
 # sklearn utils
 from sklearn.metrics import roc_auc_score, roc_curve, classification_report
@@ -317,7 +317,7 @@ def visualize_permutation_feature_importances(model, X_train, y_train):
     for i, v in enumerate(importance):
         print("Feature: %0d, Score: %.5f" % (i, v))
     trace1 = go.Bar(
-        x=cols[1:], y=importance, marker=dict(color="cornflowerblue", opacity=1)
+        x=cols_with_missing_indicators, y=importance, marker=dict(color="cornflowerblue", opacity=1)
     )
 
     data = [trace1]
@@ -370,18 +370,62 @@ def plot_box_plot(df, col_to_plot):
     iplot(fig)
 
 
+
 def plot_4d(df, col_cost):
-    """ Do 4d plot
+    """ 
+    Do 4d plot
     
     Args:
         - df (DataFrame Object): df to be represented.
-        - col_cost (string): name of column that contains values in order to set colors"""
-    fig = go.Figure(data=[go.Scatter3d(x=df.estimators, y=df.learning_rate, z=df.max_depth, 
+        - col_cost (string): name of column that contains values in order to set colors
+    """
+    fig = go.Figure()
+    fig.add_trace(go.Scatter3d(x=df.estimators, y=df.learning_rate, z=df.max_depth, name = "Cost", 
         mode='markers',
         marker=dict(
         size=6,
         color=df[col_cost],  # set color to an array/list of desired values
         colorscale='RdBu',   # choose a colorscale
+        opacity=0.8), hovertemplate="estimators: %{x}<br>learning_rate: %{y} <br>max_depth: %{z}<extra></extra>")
+    ),
+                 
+    fig.add_trace(go.Scatter3d(x=[100], y=[0.01], z=[8], name = "Best Model",marker_symbol="x",
+        mode='markers',
+        marker=dict(
+        size=1.5,
+        color="yellow",  # set color to an array/list of desired values
+        colorscale='RdBu',   # choose a colorscale
         opacity=0.8)
-    )])
-    fig.show()
+    ),
+                 )
+    
+    #data = [data1]
+    #fig = dict(data=data)
+    fig.update_layout(
+                        showlegend=False,scene = dict(
+                    xaxis_title='Estimators',
+                    yaxis_title='Learning_rate',
+                    zaxis_title='max_depth of Base Learner',
+                    annotations=[dict(
+                            showarrow=True,
+                        font=dict(
+                        family="Courier New, monospace",
+                        size=12,
+                        color="#000000"
+                        ),
+                            x=100,
+                            y=0.01,
+                            z=8,
+                            text="Best Model",
+                            xanchor="left",
+                            opacity=0.7,
+                            align="center",
+                            arrowhead=2,
+                            arrowsize=1,
+                            arrowwidth=2,
+                            arrowcolor="#000000",
+                            ax=-50,
+                            ay=-20,
+                        
+                                                            )]))
+    iplot(fig)
