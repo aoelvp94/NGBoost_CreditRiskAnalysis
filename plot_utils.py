@@ -221,31 +221,6 @@ def plot_scatter_matrix(df):
     fig.show()
 
 
-def plot_feature_importances(features, clf):
-    """
-    Show feature importances plot.
-    
-    Args:
-        - features (list of strings): list of name columns
-        - clf (XGboost model): XGboost model that was trained
-    """
-    trace1 = go.Bar(
-        y=features,
-        x=clf.feature_importances_[0],
-        marker=dict(color="cornflowerblue", opacity=1),
-        orientation="h",
-    )
-
-    data = [trace1]
-    layout = go.Layout(
-        barmode="group",
-        margin=go.layout.Margin(l=120, r=50, b=100, t=100, pad=4),
-        title="Feature importances",
-        xaxis=dict(title="Importance"),
-        yaxis=dict(title="Features"),
-    )
-    fig = dict(data=data, layout=layout)
-    iplot(fig)
 
 
 def visualize_roc_curve(model, X_train, y_train, X_test, y_test):
@@ -303,6 +278,36 @@ def visualize_roc_curve(model, X_train, y_train, X_test, y_test):
     iplot(fig)
 
 
+def plot_feature_importances(features, clf):
+    """
+    Show feature importances plot.
+    
+    Args:
+        - features (list of strings): list of name columns
+        - clf (NGboost model): NGboost model that was trained
+    """
+    df_imp = pd.DataFrame()
+    df_imp["feature_name"] = features
+    df_imp["feature_importance"] = list(clf.feature_importances_[0])
+    df_imp=df_imp.copy().sort_values("feature_importance").reset_index(drop=True)
+    trace1 = go.Bar(
+        y=df_imp.feature_name,
+        x=df_imp.feature_importance,
+        marker=dict(color="cornflowerblue", opacity=1),
+        orientation="h",
+    )
+
+    data = [trace1]
+    layout = go.Layout(
+        barmode="group",
+        margin=go.layout.Margin(l=120, r=50, b=100, t=100, pad=4),
+        title="Feature importances",
+        xaxis=dict(title="Importance"),
+        yaxis=dict(title="Features"),
+    )
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
+
 def visualize_permutation_feature_importances(model, X_train, y_train):
     """
     Plot Permutation Feature Importances
@@ -316,8 +321,18 @@ def visualize_permutation_feature_importances(model, X_train, y_train):
     importance = results.importances_mean
     for i, v in enumerate(importance):
         print("Feature: %0d, Score: %.5f" % (i, v))
+
+    df_imp = pd.DataFrame()
+    df_imp["feature_name"] = cols_with_missing_indicators
+    df_imp["feature_importance"] = list(importance)
+    df_imp=df_imp.copy().sort_values("feature_importance").reset_index(drop=True)
+
     trace1 = go.Bar(
-        x=cols_with_missing_indicators, y=importance, marker=dict(color="cornflowerblue", opacity=1)
+        
+        y=df_imp.feature_name,
+        x=df_imp.feature_importance,
+        marker=dict(color="cornflowerblue", opacity=1), 
+        orientation="h"
     )
 
     data = [trace1]
