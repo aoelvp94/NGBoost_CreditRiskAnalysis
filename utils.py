@@ -5,14 +5,13 @@ REPO OF USEFUL FUNCTIONS
 import pandas as pd
 import numpy as np
 from constants import cols
+
 # ngboost and modelling libraries
 from sklearn.metrics import roc_auc_score, roc_curve, classification_report
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.utils import class_weight
 from sklearn.inspection import permutation_importance
-
-
 
 
 def register_imputation(df):
@@ -58,7 +57,6 @@ def preprocess_df(df):
     return df
 
 
-
 def clean_outliers(df, flag_filter=False):
     """ 
     Register imputations, identify outliers with LOF and clean them. Also it process an extra function to clean some outliers.
@@ -69,7 +67,7 @@ def clean_outliers(df, flag_filter=False):
 
     Returns dataframe without outliers
     """
-    #df = preprocess_df(df.copy())
+    # df = preprocess_df(df.copy())
     df = register_imputation(df.copy())
     local_outlier_factor = LocalOutlierFactor(contamination=0.1)
     is_outlier = local_outlier_factor.fit_predict(df[cols[1:]]) == -1
@@ -136,11 +134,12 @@ def process_unit_cost(x, rate):
     """
     cost = (
         x["predicted"] * (1 - x["real"]) * x["LoanPrincipal"] * rate
-        + (1 - x["predicted"]) * x["real"] * x["LoanPrincipal"]
+        + (1 - x["predicted"]) * x["real"] * x["LoanPrincipal"] * (1 + rate)
         - x["predicted"] * (x["real"]) * x["LoanPrincipal"] * rate
         + (1 - x["predicted"]) * (1 - x["real"]) * 0
     )
     return cost
+
 
 def process_learning_unit_cost(x, alpha):
     """
@@ -152,7 +151,9 @@ def process_learning_unit_cost(x, alpha):
         
     Returns for each case his cost value.
     """
-    return alpha * (1- x["predicted"]) *  x["proba_predicted"] * (1-x["proba_predicted"])
+    return (
+        alpha * (1 - x["predicted"]) * x["proba_predicted"] * (1 - x["proba_predicted"])
+    )
 
 
 def cost_score(loan, y_pred, y_true):
@@ -171,6 +172,7 @@ def cost_score(loan, y_pred, y_true):
     )
     return sum(aux_df.apply(lambda x: process_unit_cost(x, 0.01), axis=1))
 
+
 def calculate_learning_cost(y_pred, proba_pred, alpha):
     """
     From input data, generates auxiliar dataframe in order to apply process_learning_unit.
@@ -181,16 +183,16 @@ def calculate_learning_cost(y_pred, proba_pred, alpha):
         
     Returns sum of learning unit costs
     """
-    aux_df = pd.DataFrame(
-        data={"predicted": y_pred, "proba_predicted": proba_pred}
-    )
+    aux_df = pd.DataFrame(data={"predicted": y_pred, "proba_predicted": proba_pred})
     return sum(aux_df.apply(lambda x: process_learning_unit_cost(x, alpha), axis=1))
+
 
 def calculate_cost_score_with_learning(cost_score_without_learning, learning_cost):
     """
     Process cost score with learning.
     """
-    return cost_score_without_learning - learning_cost
+    return cost_score_without_learning + learning_cost
+
 
 def generate_y_pred_with_custom_threshold(model, x_data, threshold):
     """
@@ -208,15 +210,27 @@ def generate_y_pred_with_custom_threshold(model, x_data, threshold):
     count_zero = 0
     count_one = 0
     for i in range(len(list(y_predictions))):
-        if y_predictions[i][0] > threshold:
-            y_pred.append(0)
-            count_zero += 1
-        else:
+        if y_predictions[i][1] > threshold:
             y_pred.append(1)
             count_one += 1
+        else:
+            y_pred.append(0)
+            count_zero += 1
     print("count_zero " + str(count_zero))
     print("count_one " + str(count_one))
     return y_pred
 
 
-    
+def check_counts(model, x_data, threshold):
+    y_predictions = model.predict_proba(x_data)
+    y_pred = []
+    count_zero = 0
+    count_one = 0
+    for i in range(len(list(y_predictions))):
+        if y_predictions[i][1] > threshold:
+            y_pred.append(1)
+            count_one += 1
+        else:
+            y_pred.append(0)
+            count_zero += 1
+    return count_zero, count_one
