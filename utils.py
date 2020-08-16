@@ -234,3 +234,19 @@ def check_counts(model, x_data, threshold):
             y_pred.append(0)
             count_zero += 1
     return count_zero, count_one
+
+
+def process_comsumption_customer_first_period(x, rate):
+    """
+    Compute metric s_i_1
+    
+    Args:
+        - x (pd.Series): row that contains necessary data to compute the metric.
+        - rate (float): disccount rate
+    
+    Returns computed value for metric s_i_1.
+    """
+    return (
+        x["LoanPrincipal"] * rate * (1 - x["y_true"]) - x["LoanPrincipal"] * x["y_true"]
+    )
+

@@ -34,8 +34,6 @@ def correlation_heatmap(df):
     iplot(fig)
 
 
-
-
 def plot_target_balance(target_value_counts):
     """
     Plot target balance
@@ -221,8 +219,6 @@ def plot_scatter_matrix(df):
     fig.show()
 
 
-
-
 def visualize_roc_curve(model, X_train, y_train, X_test, y_test):
     """
     Plot roc curve
@@ -289,7 +285,7 @@ def plot_feature_importances(features, clf):
     df_imp = pd.DataFrame()
     df_imp["feature_name"] = features
     df_imp["feature_importance"] = list(clf.feature_importances_[0])
-    df_imp=df_imp.copy().sort_values("feature_importance").reset_index(drop=True)
+    df_imp = df_imp.copy().sort_values("feature_importance").reset_index(drop=True)
     trace1 = go.Bar(
         y=df_imp.feature_name,
         x=df_imp.feature_importance,
@@ -308,6 +304,7 @@ def plot_feature_importances(features, clf):
     fig = dict(data=data, layout=layout)
     iplot(fig)
 
+
 def visualize_permutation_feature_importances(model, X_train, y_train):
     """
     Plot Permutation Feature Importances
@@ -325,14 +322,13 @@ def visualize_permutation_feature_importances(model, X_train, y_train):
     df_imp = pd.DataFrame()
     df_imp["feature_name"] = cols_with_missing_indicators
     df_imp["feature_importance"] = list(importance)
-    df_imp=df_imp.copy().sort_values("feature_importance").reset_index(drop=True)
+    df_imp = df_imp.copy().sort_values("feature_importance").reset_index(drop=True)
 
     trace1 = go.Bar(
-        
         y=df_imp.feature_name,
         x=df_imp.feature_importance,
-        marker=dict(color="cornflowerblue", opacity=1), 
-        orientation="h"
+        marker=dict(color="cornflowerblue", opacity=1),
+        orientation="h",
     )
 
     data = [trace1]
@@ -362,7 +358,6 @@ def color_negative_red(val):
     return "background-color: %s" % color
 
 
-
 def plot_box_plot(df, col_to_plot):
     """
     Do box plots for certain column according to target value.
@@ -372,18 +367,21 @@ def plot_box_plot(df, col_to_plot):
         - col_to_plot (string): name of column to be considered
     """
     list_name = ["Responsible (target=0)", "Delinquent (target=1)"]
-    data = [go.Box(
-        y=df.fillna(0)[(df.SeriousDlqin2yrs==x)][col_to_plot], name = list_name[x])  for x in sorted(list(df.SeriousDlqin2yrs.unique()))]
+    data = [
+        go.Box(
+            y=df.fillna(0)[(df.SeriousDlqin2yrs == x)][col_to_plot], name=list_name[x]
+        )
+        for x in sorted(list(df.SeriousDlqin2yrs.unique()))
+    ]
 
-
-    layout = dict(title= f"Boxplot about {col_to_plot}", 
-            xaxis= {"title": "Target (SeriousDlqin2yrs)"}, 
-            yaxis= {"title": f"{col_to_plot}"})
-
+    layout = dict(
+        title=f"Boxplot about {col_to_plot}",
+        xaxis={"title": "Target (SeriousDlqin2yrs)"},
+        yaxis={"title": f"{col_to_plot}"},
+    )
 
     fig = go.Figure(data=data, layout=layout)
     iplot(fig)
-
 
 
 def plot_4d(df, col_cost):
@@ -395,52 +393,70 @@ def plot_4d(df, col_cost):
         - col_cost (string): name of column that contains values in order to set colors
     """
     fig = go.Figure()
-    fig.add_trace(go.Scatter3d(x=df.estimators, y=df.learning_rate, z=df.max_depth, name = "Cost", 
-        mode='markers',
-        marker=dict(
-        size=6,
-        color=df[col_cost],  # set color to an array/list of desired values
-        colorscale='RdBu',   # choose a colorscale
-        opacity=0.8), hovertemplate="estimators: %{x}<br>learning_rate: %{y} <br>max_depth: %{z}<extra></extra>")
+    fig.add_trace(
+        go.Scatter3d(
+            x=df.estimators,
+            y=df.learning_rate,
+            z=df.max_depth,
+            name="Cost",
+            mode="markers",
+            marker=dict(
+                size=6,
+                color=df[col_cost],  # set color to an array/list of desired values
+                colorscale="RdBu",  # choose a colorscale
+                opacity=0.8,
+            ),
+            hovertemplate="estimators: %{x}<br>learning_rate: %{y} <br>max_depth: %{z}<extra></extra>",
+        )
     ),
-                 
-    fig.add_trace(go.Scatter3d(x=[100], y=[0.01], z=[8], name = "Best Model",marker_symbol="x",
-        mode='markers',
-        marker=dict(
-        size=1.5,
-        color="yellow",  # set color to an array/list of desired values
-        colorscale='RdBu',   # choose a colorscale
-        opacity=0.8)
-    ),
-                 )
-    
-    #data = [data1]
-    #fig = dict(data=data)
+
+    fig.add_trace(
+        go.Scatter3d(
+            x=[100],
+            y=[0.01],
+            z=[8],
+            name="Best Model",
+            marker_symbol="x",
+            mode="markers",
+            marker=dict(
+                size=1.5,
+                color="yellow",  # set color to an array/list of desired values
+                colorscale="RdBu",  # choose a colorscale
+                opacity=0.8,
+            ),
+        ),
+    )
+
+    # data = [data1]
+    # fig = dict(data=data)
     fig.update_layout(
-                        showlegend=False,scene = dict(
-                    xaxis_title='Estimators',
-                    yaxis_title='Learning_rate',
-                    zaxis_title='max_depth of Base Learner',
-                    annotations=[dict(
-                            showarrow=True,
-                        font=dict(
-                        family="Courier New, monospace",
-                        size=12,
-                        color="#000000"
-                        ),
-                            x=100,
-                            y=0.01,
-                            z=8,
-                            text="Best Model",
-                            xanchor="left",
-                            opacity=0.7,
-                            align="center",
-                            arrowhead=2,
-                            arrowsize=1,
-                            arrowwidth=2,
-                            arrowcolor="#000000",
-                            ax=-50,
-                            ay=-20,
-                        
-                                                            )]))
+        showlegend=False,
+        scene=dict(
+            xaxis_title="Estimators",
+            yaxis_title="Learning_rate",
+            zaxis_title="max_depth of Base Learner",
+            annotations=[
+                dict(
+                    showarrow=True,
+                    font=dict(
+                        family="Courier New, monospace", size=12, color="#000000"
+                    ),
+                    x=100,
+                    y=0.01,
+                    z=8,
+                    text="Best Model",
+                    xanchor="left",
+                    opacity=0.7,
+                    align="center",
+                    arrowhead=2,
+                    arrowsize=1,
+                    arrowwidth=2,
+                    arrowcolor="#000000",
+                    ax=-50,
+                    ay=-20,
+                )
+            ],
+        ),
+    )
     iplot(fig)
+
