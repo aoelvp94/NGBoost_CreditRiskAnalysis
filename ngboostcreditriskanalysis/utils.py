@@ -4,7 +4,7 @@ REPO OF USEFUL FUNCTIONS
 
 import pandas as pd
 import numpy as np
-from constants import cols
+from ngboostcreditriskanalysis.constants import cols
 
 # ngboost and modelling libraries
 from sklearn.metrics import roc_auc_score, roc_curve, classification_report
