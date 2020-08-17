@@ -1,5 +1,6 @@
 # EXPLORATION AND EXPLOITATION IN CREDIT RISK ANALYSIS - Master Thesis of Aldo Escobar
 __Author:__ Ing. Aldo Escobar
+
 __Advisor:__ Mg. Pablo Roccatagliata
 
 ## Abstract
