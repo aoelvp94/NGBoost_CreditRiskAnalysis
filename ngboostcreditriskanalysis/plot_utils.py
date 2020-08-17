@@ -6,7 +6,7 @@ import numpy as np
 import plotly as py
 import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-from constants import cols, cols_with_missing_indicators
+from ngboostcreditriskanalysis.constants import cols, cols_with_missing_indicators
 
 # sklearn utils
 from sklearn.metrics import roc_auc_score, roc_curve, classification_report

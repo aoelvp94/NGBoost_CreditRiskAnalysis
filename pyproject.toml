@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "ngboostcreditriskanalysis"
+version = "0.1.0"
+description = "My Master Thesis about credit risk analysis."
+authors = ["aoelvp94 <aoelvp94@gmail.com>"]
+readme = "README.md"
+repository = "https://github.com/aoelvp94/NGBoost_CreditRiskAnalysis"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+pandas = "^0.25.3"
+scikit-learn = "^0.22.2.post1"
+numpy = "^1.17.4"
+ngboost = "^0.2.1"
+imbalanced-learn = "^0.6.2"
+plotly = "^4.8.1"
+matplotlib = "^3.2.1"
+seaborn = "^0.9.0"
+eli5 = "^0.10.1"
+shap = "^0.35.0"
+lime = "^0.2.0.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
